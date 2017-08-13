@@ -16,6 +16,6 @@ defmodule Connex.Mixfile do
 
   defp deps do
     [{:poolboy, "~> 1.5"},
-     {:exredis, "~> 0.2.5", optional: true}]
+     {:redix, "~> 0.6.1", optional: true}]
   end
 end
