@@ -76,4 +76,21 @@ defmodule Connex.RedisTest do
 
     Supervisor.stop(pid)
   end
+
+  test "transactions" do
+    child_specs = Connex.Redis.child_specs()
+    {:ok, pid} = Supervisor.start_link(child_specs, strategy: :one_for_one)
+
+    assert "OK" == Connex.Redis.flushdb!(:pool1)
+
+    Connex.Redis.run(:pool1, fn client ->
+      assert "OK" == Connex.Redis.multi!(client)
+      assert "QUEUED" == Connex.Redis.set!(client, "key", "value")
+      assert "QUEUED" == Connex.Redis.set!(client, "key", "value2")
+      assert "QUEUED" == Connex.Redis.get!(client, "key")
+      assert ["OK", "OK", "value2"] == Connex.Redis.exec!(client)
+    end)
+
+    Supervisor.stop(pid)
+  end
 end

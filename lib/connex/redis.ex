@@ -57,12 +57,20 @@ defmodule Connex.Redis do
     Connex.Pool.shard(Connex.Redis, shard_name, shard_key, fun)
   end
 
-  def query(pool_name, commands, opts \\ []) do
+  def query(pool_name_or_client, commands, opts \\ [])
+  def query(pool_name, commands, opts) when is_atom(pool_name) do
     run(pool_name, fn conn -> Redix.command(conn, commands, opts) end)
   end
+  def query(client, commands, opts) do
+    Redix.command(client, commands, opts)
+  end
 
-  def query!(pool_name, commands, opts \\ []) do
+  def query!(pool_name_or_client, commands, opts \\ [])
+  def query!(pool_name, commands, opts) when is_atom(pool_name) do
     run(pool_name, fn conn -> Redix.command!(conn, commands, opts) end)
+  end
+  def query!(client, commands, opts) do
+    Redix.command!(client, commands, opts)
   end
 
   def shard_query(shard_name, shard_key, commands, opts \\ []) do
@@ -244,4 +252,11 @@ defmodule Connex.Redis do
   defredis :script_flush, []
   defredis :script_kill, []
   defredis :script_load, [:script]
+
+  # Transactions
+  defredis :discard, [] # Discard all commands issued after MULTI
+  defredis :exec, [] # Execute all commands issued after MULTI
+  defredis :multi, [] # Mark the start of a transaction block
+  defredis :unwatch, [] # Forget about all watched keys
+  defredis :watch, [:key] # [key ...] Watch the given keys to determine execution of the MULTI/EXEC block
 end
