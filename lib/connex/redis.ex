@@ -19,16 +19,20 @@ defmodule Connex.Redis.Helper do
     shard_cmd = :"shard_#{cmd}"
     shard_cmd_bang = :"shard_#{cmd}!"
     quote do
-      def unquote(cmd)(pool_name, unquote_splicing(margs), additional_commands \\ [], opts \\ []) do
+      def unquote(cmd)(pool_name, unquote_splicing(margs), additional_commands \\ [], opts \\ [])
+        when is_list(additional_commands) and is_list(opts) do
         Connex.Redis.query(pool_name, [unquote_splicing(commands ++ margs) | additional_commands], opts)
       end
-      def unquote(cmd_bang)(pool_name, unquote_splicing(margs), additional_commands \\ [], opts \\ []) do
+      def unquote(cmd_bang)(pool_name, unquote_splicing(margs), additional_commands \\ [], opts \\ [])
+        when is_list(additional_commands) and is_list(opts) do
         Connex.Redis.query!(pool_name, [unquote_splicing(commands ++ margs) | additional_commands], opts)
       end
-      def unquote(shard_cmd)(shard_name, shard_key, unquote_splicing(margs), additional_commands \\ [], opts \\ []) do
+      def unquote(shard_cmd)(shard_name, shard_key, unquote_splicing(margs), additional_commands \\ [], opts \\ [])
+        when is_list(additional_commands) and is_list(opts) do
         Connex.Redis.shard_query(shard_name, shard_key, [unquote_splicing(commands ++ margs) | additional_commands], opts)
       end
-      def unquote(shard_cmd_bang)(shard_name, shard_key, unquote_splicing(margs), additional_commands \\ [], opts \\ []) do
+      def unquote(shard_cmd_bang)(shard_name, shard_key, unquote_splicing(margs), additional_commands \\ [], opts \\ [])
+        when is_list(additional_commands) and is_list(opts) do
         Connex.Redis.shard_query!(shard_name, shard_key, [unquote_splicing(commands ++ margs) | additional_commands], opts)
       end
     end

@@ -25,6 +25,20 @@ config :my_app2,
 ```
 
 ```elixir
+  def start(_type, _args) do
+    import Supervisor.Spec
+
+    children = [
+      ...
+    ]
+    children = children ++ Connex.Redis.child_specs()
+
+    opts = [strategy: :one_for_one, name: MyApp.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+```
+
+```elixir
 pool_name = Application.fetch_env!(:my_app, :redis)
 
 "OK" = Connex.Redis.flushdb!(pool_name)

@@ -77,6 +77,27 @@ defmodule Connex.RedisTest do
     Supervisor.stop(pid)
   end
 
+  test "string apis" do
+    child_specs = Connex.Redis.child_specs()
+    {:ok, pid} = Supervisor.start_link(child_specs, strategy: :one_for_one)
+
+    assert "OK" == Connex.Redis.flushdb!(:pool1)
+
+    assert "OK" == Connex.Redis.set!(:pool1, "test", "10")
+    assert 11 == Connex.Redis.incr!(:pool1, "test")
+    assert 10 == Connex.Redis.decr!(:pool1, "test")
+    assert 12 == Connex.Redis.incrby!(:pool1, "test", 2)
+    assert 10 == Connex.Redis.decrby!(:pool1, "test", 2)
+    assert "10.5" == Connex.Redis.incrbyfloat!(:pool1, "test", 0.5)
+    assert "10" == Connex.Redis.incrbyfloat!(:pool1, "test", -0.5)
+    assert "10" == Connex.Redis.getset!(:pool1, "test", 100)
+    assert 7 == Connex.Redis.append!(:pool1, "test", "fooo")
+    assert "00fo" == Connex.Redis.getrange!(:pool1, "test", 1, 4)
+    assert 7 == Connex.Redis.strlen!(:pool1, "test")
+
+    Supervisor.stop(pid)
+  end
+
   test "transactions" do
     child_specs = Connex.Redis.child_specs()
     {:ok, pid} = Supervisor.start_link(child_specs, strategy: :one_for_one)
