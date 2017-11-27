@@ -23,11 +23,11 @@ defmodule Connex.Pool do
     end
   end
 
-  def run(config_name, pool_name, fun) do
+  def run(config_name, pool_name, fun) when is_atom(pool_name) do
     :poolboy.transaction(make_real_pool_name(config_name, pool_name), fun)
   end
 
-  def shard(config_name, shard_name, shard_key, fun) do
+  def run(config_name, {shard_name, shard_key}, fun) when is_atom(shard_name) do
     config = Application.fetch_env!(:connex, config_name)
     shards = Keyword.fetch!(config, :shards)
     shard = Keyword.fetch!(shards, shard_name)

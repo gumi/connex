@@ -16,24 +16,14 @@ defmodule Connex.Redis.Helper do
                |> String.split("_")
                |> Enum.map(&String.upcase/1)
     cmd_bang = :"#{cmd}!"
-    shard_cmd = :"shard_#{cmd}"
-    shard_cmd_bang = :"shard_#{cmd}!"
     quote do
-      def unquote(cmd)(pool_name, unquote_splicing(margs), additional_commands \\ [], opts \\ [])
+      def unquote(cmd)(pool_name_or_shards, unquote_splicing(margs), additional_commands \\ [], opts \\ [])
         when is_list(additional_commands) and is_list(opts) do
-        Connex.Redis.query(pool_name, [unquote_splicing(commands ++ margs) | additional_commands], opts)
+        Connex.Redis.query(pool_name_or_shards, [unquote_splicing(commands ++ margs) | additional_commands], opts)
       end
-      def unquote(cmd_bang)(pool_name, unquote_splicing(margs), additional_commands \\ [], opts \\ [])
+      def unquote(cmd_bang)(pool_name_or_shards, unquote_splicing(margs), additional_commands \\ [], opts \\ [])
         when is_list(additional_commands) and is_list(opts) do
-        Connex.Redis.query!(pool_name, [unquote_splicing(commands ++ margs) | additional_commands], opts)
-      end
-      def unquote(shard_cmd)(shard_name, shard_key, unquote_splicing(margs), additional_commands \\ [], opts \\ [])
-        when is_list(additional_commands) and is_list(opts) do
-        Connex.Redis.shard_query(shard_name, shard_key, [unquote_splicing(commands ++ margs) | additional_commands], opts)
-      end
-      def unquote(shard_cmd_bang)(shard_name, shard_key, unquote_splicing(margs), additional_commands \\ [], opts \\ [])
-        when is_list(additional_commands) and is_list(opts) do
-        Connex.Redis.shard_query!(shard_name, shard_key, [unquote_splicing(commands ++ margs) | additional_commands], opts)
+        Connex.Redis.query!(pool_name_or_shards, [unquote_splicing(commands ++ margs) | additional_commands], opts)
       end
     end
   end
@@ -53,36 +43,30 @@ defmodule Connex.Redis do
     Connex.Pool.child_specs(Connex.Redis, default_pool_args())
   end
 
-  def run(pool_name, fun) do
-    Connex.Pool.run(Connex.Redis, pool_name, fun)
+  def run(pool_name_or_shards, fun) do
+    Connex.Pool.run(Connex.Redis, pool_name_or_shards, fun)
   end
 
-  def shard(shard_name, shard_key, fun) do
-    Connex.Pool.shard(Connex.Redis, shard_name, shard_key, fun)
-  end
-
-  def query(pool_name_or_client, commands, opts \\ [])
+  def query(pool_name_or_shards_or_client, commands, opts \\ [])
   def query(pool_name, commands, opts) when is_atom(pool_name) do
     run(pool_name, fn conn -> Redix.command(conn, commands, opts) end)
+  end
+  def query({shard_name, shard_key}, commands, opts) when is_atom(shard_name) do
+    run({shard_name, shard_key}, fn conn -> Redix.command(conn, commands, opts) end)
   end
   def query(client, commands, opts) do
     Redix.command(client, commands, opts)
   end
 
-  def query!(pool_name_or_client, commands, opts \\ [])
+  def query!(pool_name_or_shards_client, commands, opts \\ [])
   def query!(pool_name, commands, opts) when is_atom(pool_name) do
     run(pool_name, fn conn -> Redix.command!(conn, commands, opts) end)
   end
+  def query!({shard_name, shard_key}, commands, opts) when is_atom(shard_name) do
+    run({shard_name, shard_key}, fn conn -> Redix.command!(conn, commands, opts) end)
+  end
   def query!(client, commands, opts) do
     Redix.command!(client, commands, opts)
-  end
-
-  def shard_query(shard_name, shard_key, commands, opts \\ []) do
-    shard(shard_name, shard_key, fn conn -> Redix.command(conn, commands, opts) end)
-  end
-
-  def shard_query!(shard_name, shard_key, commands, opts \\ []) do
-    shard(shard_name, shard_key, fn conn -> Redix.command!(conn, commands, opts) end)
   end
 
   import Connex.Redis.Helper, only: [defredis: 2]

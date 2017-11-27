@@ -28,12 +28,12 @@ defmodule Connex.PoolTest do
     child_specs = Connex.Pool.child_specs(Connex.PoolTest, worker_module: Connex.PoolTest.Mock)
     {:ok, pid} = Supervisor.start_link(child_specs, strategy: :one_for_one)
 
-    assert "value1" == Connex.Pool.shard(Connex.PoolTest, :shard1, "test1", &(GenServer.call(&1, :get_key)))
-    assert "value2" == Connex.Pool.shard(Connex.PoolTest, :shard1, "test2", &(GenServer.call(&1, :get_key)))
-    assert "value3" == Connex.Pool.shard(Connex.PoolTest, :shard1, "test8", &(GenServer.call(&1, :get_key)))
+    assert "value1" == Connex.Pool.run(Connex.PoolTest, {:shard1, "test1"}, &(GenServer.call(&1, :get_key)))
+    assert "value2" == Connex.Pool.run(Connex.PoolTest, {:shard1, "test2"}, &(GenServer.call(&1, :get_key)))
+    assert "value3" == Connex.Pool.run(Connex.PoolTest, {:shard1, "test8"}, &(GenServer.call(&1, :get_key)))
 
-    assert "value3" == Connex.Pool.shard(Connex.PoolTest, :shard2, "test1", &(GenServer.call(&1, :get_key)))
-    assert "value2" == Connex.Pool.shard(Connex.PoolTest, :shard2, "test5", &(GenServer.call(&1, :get_key)))
+    assert "value3" == Connex.Pool.run(Connex.PoolTest, {:shard2, "test1"}, &(GenServer.call(&1, :get_key)))
+    assert "value2" == Connex.Pool.run(Connex.PoolTest, {:shard2, "test5"}, &(GenServer.call(&1, :get_key)))
 
     Supervisor.stop(pid)
   end

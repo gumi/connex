@@ -55,6 +55,6 @@ nil = Connex.Redis.set!(pool_name, "key", "value_nx", [:nx])
 # with sharding
 shard_name = Application.fetch_env!(:my_app2, :redis_shard)
 
-"OK" == Connex.Redis.shard_set!(shard_name, "shardkey", "key", "value")
-"value" == Connex.Redis.shard_get!(shard_name, "shardkey", "key")
+"OK" == Connex.Redis.set!({shard_name, "shardkey"}, "key", "value")
+"value" == Connex.Redis.get!({shard_name, "shardkey"}, "key")
 ```
