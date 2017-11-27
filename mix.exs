@@ -6,8 +6,7 @@ defmodule Connex.Mixfile do
       app: :connex,
       version: "1.0.0",
       elixir: "~> 1.4",
-      elixirc_paths: elixirc_paths(Mix.env),
-      description: "Validate JSON and store to a specified data structure",
+      description: "Pooling and sharding connections",
       package: [
         maintainers: ["melpon", "kenichirow"],
         licenses: ["Apache 2.0"],
@@ -17,6 +16,7 @@ defmodule Connex.Mixfile do
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps(),
+      source_url: "https://github.com/gumi/connex",
     ]
   end
 
