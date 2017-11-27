@@ -1,18 +1,5 @@
 defmodule Connex do
   @moduledoc """
-  Documentation for Connex.
+  #{File.read!("README.md")}
   """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Connex.hello
-      :world
-
-  """
-  def hello do
-    :world
-  end
 end
