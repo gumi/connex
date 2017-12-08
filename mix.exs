@@ -17,6 +17,7 @@ defmodule Connex.Mixfile do
       start_permanent: Mix.env == :prod,
       deps: deps(),
       source_url: "https://github.com/gumi/connex",
+      aliases: [test: &mix_test/1],
     ]
   end
 
@@ -31,6 +32,12 @@ defmodule Connex.Mixfile do
       {:poolboy, "~> 1.5"},
       {:redix, "~> 0.6.1", optional: true},
       {:ex_doc, "~> 0.18.1", only: :dev, runtime: false},
+      {:env, "~> 0.2.0", only: :test},
     ]
+  end
+
+  defp mix_test(args) do
+    System.put_env("CONNEX_REDIS_HOST", "localhost")
+    Mix.Task.run "test", args
   end
 end

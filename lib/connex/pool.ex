@@ -11,6 +11,7 @@ defmodule Connex.Pool do
     pool_name = make_real_pool_name(config_name, pool_name)
     pool_args = Keyword.merge([name: {:local, pool_name}], pool_args)
     pool_args = Keyword.merge(pool_args, override_pool_args)
+    pool_args = resolve(pool_args, config_name)
 
     :poolboy.child_spec(pool_name, pool_args, worker_args)
   end
@@ -34,5 +35,14 @@ defmodule Connex.Pool do
     n = :erlang.phash2(shard_key, length(shard))
     pool_name = Enum.at(shard, n)
     run(config_name, pool_name, fun)
+  end
+
+  def resolve(value, config_name) do
+    config = Application.fetch_env!(:connex, config_name)
+    case Keyword.fetch(config, :resolver) do
+      {:ok, resolver} when resolver == Env -> resolver.resolve(value, :connex, [:unused], fn _, value -> value end)
+      {:ok, resolver} -> resolver.resolve(value)
+      :error -> value
+    end
   end
 end
