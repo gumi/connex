@@ -10,20 +10,20 @@ defmodule Connex.Mixfile do
       package: [
         maintainers: ["melpon", "kenichirow"],
         licenses: ["Apache 2.0"],
-        links: %{"GitHub" => "https://github.com/gumi/connex"},
+        links: %{"GitHub" => "https://github.com/gumi/connex"}
       ],
       docs: [main: "Connex"],
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       source_url: "https://github.com/gumi/connex",
-      aliases: [test: &mix_test/1],
+      aliases: [test: &mix_test/1]
     ]
   end
 
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger]
     ]
   end
 
@@ -32,12 +32,12 @@ defmodule Connex.Mixfile do
       {:poolboy, "~> 1.5"},
       {:redix, "~> 0.6.1", optional: true},
       {:ex_doc, "~> 0.18.1", only: :dev, runtime: false},
-      {:env, "~> 0.2.0", only: :test},
+      {:env, "~> 0.2.0", only: :test}
     ]
   end
 
   defp mix_test(args) do
     System.put_env("CONNEX_REDIS_HOST", "localhost")
-    Mix.Task.run "test", args
+    Mix.Task.run("test", args)
   end
 end

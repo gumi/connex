@@ -5,12 +5,13 @@ defmodule Connex.RedisTest do
     child_specs = Connex.Redis.child_specs()
     {:ok, pid} = Supervisor.start_link(child_specs, strategy: :one_for_one)
 
-    assert "OK" == Connex.Redis.run(:pool1, fn client -> Redix.command!(client, ["SET", "key", "value1"]) end)
-    assert "OK" == Connex.Redis.run(:pool2, fn client -> Redix.command!(client, ["SET", "key", "value2"]) end)
-    assert "OK" == Connex.Redis.run(:pool3, fn client -> Redix.command!(client, ["SET", "key", "value3"]) end)
-    assert "value1" == Connex.Redis.run(:pool1, fn client -> Redix.command!(client, ["GET", "key"]) end)
-    assert "value2" == Connex.Redis.run(:pool2, fn client -> Redix.command!(client, ["GET", "key"]) end)
-    assert "value3" == Connex.Redis.run(:pool3, fn client -> Redix.command!(client, ["GET", "key"]) end)
+    run = fn command -> &Redix.command!(&1, command) end
+    assert "OK" == Connex.Redis.run(:pool1, run.(["SET", "key", "value1"]))
+    assert "OK" == Connex.Redis.run(:pool2, run.(["SET", "key", "value2"]))
+    assert "OK" == Connex.Redis.run(:pool3, run.(["SET", "key", "value3"]))
+    assert "value1" == Connex.Redis.run(:pool1, run.(["GET", "key"]))
+    assert "value2" == Connex.Redis.run(:pool2, run.(["GET", "key"]))
+    assert "value3" == Connex.Redis.run(:pool3, run.(["GET", "key"]))
 
     Supervisor.stop(pid)
   end
@@ -19,19 +20,20 @@ defmodule Connex.RedisTest do
     child_specs = Connex.Redis.child_specs()
     {:ok, pid} = Supervisor.start_link(child_specs, strategy: :one_for_one)
 
-    assert "OK" == Connex.Redis.run({:shard1, "test1"}, fn client -> Redix.command!(client, ["SET", "key", "value1"]) end)
-    assert "OK" == Connex.Redis.run({:shard1, "test2"}, fn client -> Redix.command!(client, ["SET", "key", "value2"]) end)
-    assert "OK" == Connex.Redis.run({:shard1, "test8"}, fn client -> Redix.command!(client, ["SET", "key", "value3"]) end)
+    run = fn command -> &Redix.command!(&1, command) end
+    assert "OK" == Connex.Redis.run({:shard1, "test1"}, run.(["SET", "key", "value1"]))
+    assert "OK" == Connex.Redis.run({:shard1, "test2"}, run.(["SET", "key", "value2"]))
+    assert "OK" == Connex.Redis.run({:shard1, "test8"}, run.(["SET", "key", "value3"]))
 
-    assert "value1" == Connex.Redis.run({:shard1, "test1"}, fn client -> Redix.command!(client, ["GET", "key"]) end)
-    assert "value2" == Connex.Redis.run({:shard1, "test2"}, fn client -> Redix.command!(client, ["GET", "key"]) end)
-    assert "value3" == Connex.Redis.run({:shard1, "test8"}, fn client -> Redix.command!(client, ["GET", "key"]) end)
+    assert "value1" == Connex.Redis.run({:shard1, "test1"}, run.(["GET", "key"]))
+    assert "value2" == Connex.Redis.run({:shard1, "test2"}, run.(["GET", "key"]))
+    assert "value3" == Connex.Redis.run({:shard1, "test8"}, run.(["GET", "key"]))
 
-    assert "OK" == Connex.Redis.run({:shard2, "test1"}, fn client -> Redix.command!(client, ["SET", "key", "value3"]) end)
-    assert "OK" == Connex.Redis.run({:shard2, "test5"}, fn client -> Redix.command!(client, ["SET", "key", "value2"]) end)
+    assert "OK" == Connex.Redis.run({:shard2, "test1"}, run.(["SET", "key", "value3"]))
+    assert "OK" == Connex.Redis.run({:shard2, "test5"}, run.(["SET", "key", "value2"]))
 
-    assert "value3" == Connex.Redis.run({:shard2, "test1"}, fn client -> Redix.command!(client, ["GET", "key"]) end)
-    assert "value2" == Connex.Redis.run({:shard2, "test5"}, fn client -> Redix.command!(client, ["GET", "key"]) end)
+    assert "value3" == Connex.Redis.run({:shard2, "test1"}, run.(["GET", "key"]))
+    assert "value2" == Connex.Redis.run({:shard2, "test5"}, run.(["GET", "key"]))
 
     Supervisor.stop(pid)
   end

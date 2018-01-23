@@ -19,6 +19,7 @@ defmodule Connex.Pool do
   def child_specs(config_name, override_pool_args) do
     config = Application.fetch_env!(:connex, config_name)
     pools = Keyword.fetch!(config, :pools)
+
     for {pool_name, _} <- pools do
       child_spec(config_name, pool_name, override_pool_args)
     end
@@ -39,10 +40,16 @@ defmodule Connex.Pool do
 
   def resolve(value, config_name) do
     config = Application.fetch_env!(:connex, config_name)
+
     case Keyword.fetch(config, :resolver) do
-      {:ok, resolver} when resolver == Env -> resolver.resolve(value, :connex, [:unused], fn _, value -> value end)
-      {:ok, resolver} -> resolver.resolve(value)
-      :error -> value
+      {:ok, resolver} when resolver == Env ->
+        resolver.resolve(value, :connex, [:unused], fn _, value -> value end)
+
+      {:ok, resolver} ->
+        resolver.resolve(value)
+
+      :error ->
+        value
     end
   end
 end
