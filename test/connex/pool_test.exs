@@ -4,6 +4,10 @@ defmodule Connex.PoolTest do
   defmodule Mock do
     use GenServer
 
+    def init(args) do
+      {:ok, args}
+    end
+
     def start_link(args) do
       GenServer.start_link(__MODULE__, args)
     end
