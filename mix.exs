@@ -4,7 +4,7 @@ defmodule Connex.Mixfile do
   def project do
     [
       app: :connex,
-      version: "1.0.3",
+      version: "1.0.4",
       elixir: "~> 1.4",
       description: "Pooling and sharding connections",
       package: [
@@ -30,8 +30,8 @@ defmodule Connex.Mixfile do
   defp deps do
     [
       {:poolboy, "~> 1.5"},
-      {:redix, "~> 0.6.1", optional: true},
-      {:ex_doc, "~> 0.18.1", only: :dev, runtime: false},
+      {:redix, "~> 0.7.1", optional: true},
+      {:ex_doc, "~> 0.18.3", only: :dev, runtime: false},
       {:env, "~> 0.2.0", only: :test}
     ]
   end
