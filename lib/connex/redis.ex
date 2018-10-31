@@ -7,6 +7,12 @@ defmodule Connex.Redis.Worker do
     connection_opts = Connex.Pool.resolve(connection_opts, Connex.Redis)
     Redix.start_link(uri_or_redis_opts, connection_opts)
   end
+
+  @impl :poolboy_worker
+  def start_link(opts) do
+    opts = Connex.Pool.resolve(opts, Connex.Redis)
+    Redix.start_link(opts)
+  end
 end
 
 defmodule Connex.Redis.Helper do
