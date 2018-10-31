@@ -9,9 +9,9 @@ config :connex, Connex.Redis,
   pools:
     # <pool_name>: {<poolboy_configuration>, <Arguments passed to Redix.start_link/2>}
     # <poolboy_configuration> is defaulted the value as [worker_module: Connex.Redis.Worker, size: 10]
-    [pool1: {[], {[database: 0], []}},
-     pool2: {[], {[database: 1], []}},
-     pool3: {[], {[database: 2], []}}],
+    [pool1: {[], [database: 0]},
+     pool2: {[], [database: 1]},
+     pool3: {[], [database: 2]}],
   shards:
     # <shard_name>: [<pool_name>, ...]
     [shard1: [:pool1, :pool2, :pool3],
