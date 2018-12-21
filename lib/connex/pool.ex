@@ -3,25 +3,25 @@ defmodule Connex.Pool do
     Module.concat(config_name, pool_name)
   end
 
-  def child_spec(config_name, pool_name, override_pool_args) do
+  def child_spec(config_name, pool_name, default_pool_args) do
     config = Application.fetch_env!(:connex, config_name)
     pools = Keyword.fetch!(config, :pools)
     {pool_args, worker_args} = Keyword.fetch!(pools, pool_name)
 
     pool_name = make_real_pool_name(config_name, pool_name)
+    pool_args = Keyword.merge(default_pool_args, pool_args)
     pool_args = Keyword.merge([name: {:local, pool_name}], pool_args)
-    pool_args = Keyword.merge(pool_args, override_pool_args)
     pool_args = resolve(pool_args, config_name)
 
     :poolboy.child_spec(pool_name, pool_args, worker_args)
   end
 
-  def child_specs(config_name, override_pool_args) do
+  def child_specs(config_name, default_pool_args) do
     config = Application.fetch_env!(:connex, config_name)
     pools = Keyword.fetch!(config, :pools)
 
     for {pool_name, _} <- pools do
-      child_spec(config_name, pool_name, override_pool_args)
+      child_spec(config_name, pool_name, default_pool_args)
     end
   end
 

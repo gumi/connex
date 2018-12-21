@@ -4,7 +4,7 @@ defmodule Connex.Mixfile do
   def project do
     [
       app: :connex,
-      version: "1.0.5",
+      version: "1.0.6",
       elixir: "~> 1.4",
       description: "Pooling and sharding connections",
       package: [
