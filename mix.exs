@@ -5,7 +5,7 @@ defmodule Connex.Mixfile do
     [
       app: :connex,
       version: "1.0.6",
-      elixir: "~> 1.4",
+      elixir: "~> 1.8",
       description: "Pooling and sharding connections",
       package: [
         maintainers: ["melpon", "kenichirow"],
@@ -30,8 +30,8 @@ defmodule Connex.Mixfile do
   defp deps do
     [
       {:poolboy, "~> 1.5"},
-      {:redix, "~> 0.8.2", optional: true},
-      {:ex_doc, "~> 0.19.1", only: :dev, runtime: false},
+      {:redix, "~> 0.9.2", optional: true},
+      {:ex_doc, "~> 0.19.3", only: :dev, runtime: false},
       {:env, "~> 0.2.0", only: :test}
     ]
   end
