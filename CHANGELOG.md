@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.9
+
+- Update dependencies
+
 ## 1.0.8
 
 - Fix for Elixir 1.9
